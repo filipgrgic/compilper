@@ -1,0 +1,299 @@
+%{
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "tree.h"
+
+#define PANIC(...) fprintf(stderr, __VA_ARGS__)
+%}
+
+%start rax
+%term NUM_N=0 VAR_N=1 RETURN_N=2 FUNC_N=3 PLUS_N=4 MULT_N=5 MIN_N=6 AND_N=7 NOT_N=8 GREAT_N=9 EQUALS_N=10 ARRAY_N=11
+
+%%
+
+rax: NUM_N # 1 # printf("    movq $%ld, %%rax\n", bnode->num);
+r10: NUM_N # 1 # printf("    movq $%ld, %%r10\n", bnode->num);
+r11: NUM_N # 1 # printf("    movq $%ld, %%r11\n", bnode->num);
+
+rax: VAR_N # 1 # printf("    movq %d(%%rbp), %%rax\n", var_offset(bnode->name));
+r10: VAR_N # 1 # printf("    movq %d(%%rbp), %%r10\n", var_offset(bnode->name));
+r11: VAR_N # 1 # printf("    movq %d(%%rbp), %%r11\n", var_offset(bnode->name));
+
+rax: PLUS_N(rax,r10) # 1 # printf("    addq %%r10, %%rax\n");
+r10: PLUS_N(r10,r11) # 1 # printf("    addq %%r11, %%r10\n");
+
+rax: MULT_N(rax,r10) # 1 # printf("    imulq %%r10, %%rax\n");
+r10: MULT_N(r10,r11) # 1 # printf("    imulq %%r11, %%r10\n");
+
+rax: MIN_N(rax,r10) # 1 # printf("    subq %%r10, %%rax\n");
+r10: MIN_N(r10,r11) # 1 # printf("    subq %%r11, %%r10\n");
+
+rax: AND_N(rax,r10) # 1 # printf("    andq %%r10, %%rax\n");
+r10: AND_N(r10,r11) # 1 # printf("    andq %%r11, %%r10\n");
+
+rax: NOT_N(rax) # 1 # printf("    notq %%rax\n");
+r10: NOT_N(r10) # 1 # printf("    notq %%r10\n");
+
+rax: GREAT_N(rax,r10) # 1 # printf("    cmpq %%r10, %%rax\n    setg %%al\n    movzbq %%al, %%rax\n");
+r10: GREAT_N(r10,r11) # 1 # printf("    cmpq %%r11, %%r10\n    setg %%r10b\n    movzbq %%r10b, %%r10\n");
+
+rax: EQUALS_N(rax,r10) # 1 # printf("    cmpq %%r10, %%rax\n    sete %%al\n    movzbq %%al, %%rax\n");
+r10: EQUALS_N(r10,r11) # 1 # printf("    cmpq %%r11, %%r10\n    sete %%r10b\n    movzbq %%r10b, %%r10\n");
+
+rax: ARRAY_N(rax,r10) # 1 # printf("    movq (%%rax,%%r10,8), %%rax\n");
+r10: ARRAY_N(r10,r11) # 1 # printf("    movq (%%r10,%%r11,8), %%r10\n");
+
+%%
+
+static char *var_names[256];
+static int var_offsets[256];
+static int var_count = 0;
+static int next_offset = 0;
+static int param_count = 0;
+
+static int label_count = 0;
+
+static char *cond_names[256];
+static int cond_start_labels[256];
+static int cond_end_labels[256];
+static int cond_count = 0;
+
+int reset_params(void) {
+    var_count = 0;
+    next_offset = 0;
+    param_count = 0;
+    cond_count = 0;
+    return 0;
+}
+
+int add_param(char *name) {
+    if (var_count < 256) {
+        next_offset -= 8;
+        var_names[var_count] = name;
+        var_offsets[var_count] = next_offset;
+        var_count++;
+	param_count++;
+    }
+    return 0;
+}
+
+int add_local(char *name) {
+    if (var_count < 256) {
+        next_offset -= 8;
+        var_names[var_count] = name;
+        var_offsets[var_count] = next_offset;
+        var_count++;
+    }
+    return 0;
+}
+
+int var_offset(char *name) {
+    for (int i = var_count - 1; i >= 0; i--) {
+        if (strcmp(name, var_names[i]) == 0) {
+            return var_offsets[i];
+        }
+    }
+
+    return 0;
+}
+
+void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
+
+void store_params(void) {
+    static const char *param_regs[] = {
+        "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"
+    };
+
+    for (int i = 0; i < param_count && i < 6; i++) {
+        printf("    subq $8, %%rsp\n");
+        printf("    movq %s, %d(%%rbp)\n", param_regs[i], var_offsets[i]);
+    }
+}
+
+void generate_expr(treenode_t *expr) {
+    if (!expr) return;
+
+    burm_label(expr);
+    burm_reduce(expr, burm_rax_NT);
+}
+
+int new_label(void) {
+    label_count++;
+    return label_count;
+}
+
+void push_cond(char *name, int start_label, int end_label) {
+    if (cond_count < 256) {
+        cond_names[cond_count] = name;
+        cond_start_labels[cond_count] = start_label;
+        cond_end_labels[cond_count] = end_label;
+        cond_count++;
+    }
+}
+
+void pop_cond(void) {
+    if (cond_count > 0) {
+        cond_count--;
+    }
+}
+
+int find_cond_start(char *name) {
+    if (name == NULL) {
+        return cond_start_labels[cond_count - 1];
+    }
+
+    for (int i = cond_count - 1; i >= 0; i--) {
+        if (cond_names[i] != NULL && strcmp(cond_names[i], name) == 0) {
+            return cond_start_labels[i];
+        }
+    }
+
+    return cond_start_labels[cond_count - 1];
+}
+
+int find_cond_end(char *name) {
+    if (name == NULL) {
+        return cond_end_labels[cond_count - 1];
+    }
+
+    for (int i = cond_count - 1; i >= 0; i--) {
+        if (cond_names[i] != NULL && strcmp(cond_names[i], name) == 0) {
+            return cond_end_labels[i];
+        }
+    }
+
+    return cond_end_labels[cond_count - 1];
+}
+
+void generate_statement(treenode_t *node);
+
+void generate_contbreak(treenode_t *node) {
+    if (!node) return;
+
+    if (node->type == CONTINUE_N) {
+        printf("    jmp .Lcond_start_%d\n", find_cond_start(node->name));
+    } else if (node->type == BREAK_N) {
+        printf("    jmp .Lcond_end_%d\n", find_cond_end(node->name));
+    }
+}
+
+void generate_guarded(treenode_t *node) {
+    if (!node) return;
+
+    int next_label = new_label();
+
+    if (node->left != NULL) {
+        generate_expr(node->left);
+        printf("    testq $1, %%rax\n");
+        printf("    jz .Lguard_next_%d\n", next_label);
+    }
+
+    generate_statement(node->right);
+    generate_contbreak(node->third);
+
+    printf(".Lguard_next_%d:\n", next_label);
+}
+
+void generate_guarded_list(treenode_t *node) {
+    if (!node) return;
+
+    if (node->type == STATS_N) {
+        generate_guarded_list(node->left);
+        generate_guarded_list(node->right);
+    } else {
+        generate_guarded(node);
+    }
+}
+
+void generate_statement(treenode_t *node) {
+    if (!node) return;
+
+    switch (node->type) {
+        case STATS_N:
+            generate_statement(node->left);
+            generate_statement(node->right);
+            break;
+
+        case RETURN_N:
+            generate_expr(node->left);
+            printf("    leave\n");
+            printf("    ret\n");
+            break;
+
+        case VARDEF_N:
+            add_local(node->name);
+            printf("    subq $8, %%rsp\n");
+            generate_expr(node->left);
+            printf("    movq %%rax, %d(%%rbp)\n", var_offset(node->name));
+            break;
+
+        case ASSIGN_N:
+            generate_expr(node->left);
+            printf("    movq %%rax, %d(%%rbp)\n", var_offset(node->name));
+            break;
+	
+	case ARRAY_ASSIGN_N:
+            generate_expr(node->left);
+            printf("    subq $8, %%rsp\n");
+            printf("    movq %%rax, (%%rsp)\n");
+            generate_expr(node->right);
+            printf("    subq $8, %%rsp\n");
+            printf("    movq %%rax, (%%rsp)\n");
+            generate_expr(node->third);
+            printf("    movq (%%rsp), %%r11\n");
+            printf("    addq $8, %%rsp\n");
+            printf("    movq (%%rsp), %%r10\n");
+            printf("    addq $8, %%rsp\n");
+            printf("    movq %%rax, (%%r10,%%r11,8)\n");
+            break;
+
+	case CONDS_N: {
+            int start_label = new_label();
+            int end_label = new_label();
+
+            push_cond(node->name, start_label, end_label);
+
+            printf(".Lcond_start_%d:\n", start_label);
+            generate_guarded_list(node->left);
+            printf(".Lcond_end_%d:\n", end_label);
+
+            pop_cond();
+            break;
+        }
+
+        case CONTINUE_N:
+            printf("    jmp .Lcond_start_%d\n", find_cond_start(node->name));
+            break;
+
+        case BREAK_N:
+            printf("    jmp .Lcond_end_%d\n", find_cond_end(node->name));
+            break;
+
+        case TERMSTAT_N:
+            generate_expr(node->left);
+            break;
+
+        default:
+            break;
+    }
+}
+
+int generate_function(treenode_t *func) {
+    if (!func || func->type != FUNC_N) return 0;
+
+    printf(".globl %s\n", func->name);
+    printf("%s:\n", func->name);
+    printf("    pushq %%rbp\n");
+    printf("    movq %%rsp, %%rbp\n");
+
+    store_params();
+    generate_statement(func->left);
+
+    printf("    movq $0, %%rax\n");
+    printf("    leave\n");
+    printf("    ret\n");
+
+    return 0;
+}
