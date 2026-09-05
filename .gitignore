@@ -1,5 +1,7 @@
 # Compiled binary
 compilper
+test
+a.out
 *.o
 *.out
 
@@ -16,12 +18,18 @@ y.tab.h
 compilper.brg
 iburg.c
 
+# Test / generated assembly files
+test.c
+test.s
+fulltest.src
+
 # Debug / temporary files
 *.log
 *.tmp
 *~
-.core
 core
+core.*
+*.core
 
 # IDE / editor files
 .vscode/
