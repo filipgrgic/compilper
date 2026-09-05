@@ -8,20 +8,29 @@
 #include <string.h>
 
 long convertToNumber(char *name) {
-	char *clean = malloc(strlen(name) + 1);
-	int i = 0;
-	int j = 0;
-	while(name[i] != '\0') {
-		if (name[i] != '_') {
-			clean[j] = name[i];
-			i++;
-			j++;
-		} else i++;
-	}
-	clean[j] = '\0';
-	long result = strtoll(clean, NULL, 0);
-	free(clean);
-	return result;
+        char *clean = malloc(strlen(name) + 1);
+        int i = 0;
+        int j = 0;
+
+        while (name[i] != '\0') {
+                if (name[i] != '_') {
+                        clean[j++] = name[i];
+                }
+                i++;
+        }
+
+        clean[j] = '\0';
+
+        int base = 10;
+
+        if (clean[0] == '0' && clean[1] == 'x') {
+                base = 16;
+        }
+
+        long result = strtoll(clean, NULL, base);
+
+        free(clean);
+        return result;
 }
 %}
 

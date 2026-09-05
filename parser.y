@@ -122,7 +122,7 @@ treenode_t* make_contbreak(int kind, char *label) {
 @attributes { table_t *in; table_t *out; int init; int add; } Pars
 @attributes { table_t *in; table_t *out; struct treenode *t; } Stats Stat
 @attributes { table_t *in; struct treenode *t; } Conds GuardedList Guarded OptExpr
-@attributes { table_t *in; } ExprList
+@attributes { table_t *in; struct treenode *t; } ExprList
 @attributes { table_t *in; struct treenode *t; } Expr NotExpr AddExpr MultExpr AndExpr
 @attributes { table_t *in; int ok; char *name; } OptId
 @attributes { table_t *in; int ok; char *name; struct treenode *base; struct treenode *index; } Lexpr
@@ -425,20 +425,29 @@ Term    :   '(' Expr ')'
                     @i @Term.ok@ = checkVar(@ID.name@, @Term.in@);
                     @i @Term.t@ = create_var(@ID.name@);
                 @}
-        |   ID '(' ExprList OptExpr ')'
-                @{
-                    @i @ExprList.in@ = @Term.in@;
-                    @i @OptExpr.in@ = @Term.in@;
-                    @i @Term.ok@ = 1;
-                    @i @Term.t@ = NULL;
-                @}
+	|   ID '(' ExprList OptExpr ')'
+        @{
+            @i @ExprList.in@ = @Term.in@;
+            @i @OptExpr.in@ = @Term.in@;
+            @i @Term.ok@ = 1;
+            @i @Term.t@ =
+                create_call(
+                    @ID.name@,
+                    create_args(@ExprList.t@, @OptExpr.t@)
+                );
+        @}
         ;
 
 ExprList:   /* empty */
+                @{
+                    @i @ExprList.t@ = NULL;
+                @}
         |   ExprList Expr ','
                 @{
                     @i @Expr.in@ = @ExprList.0.in@;
                     @i @ExprList.1.in@ = @ExprList.0.in@;
+                    @i @ExprList.0.t@ =
+                        create_args(@ExprList.1.t@, @Expr.t@);
                 @}
         ;
 

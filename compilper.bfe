@@ -16,36 +16,73 @@
 rax: NUM_N # 1 # printf("    movq $%ld, %%rax\n", bnode->num);
 r10: NUM_N # 1 # printf("    movq $%ld, %%r10\n", bnode->num);
 r11: NUM_N # 1 # printf("    movq $%ld, %%r11\n", bnode->num);
+r8: NUM_N # 1 # printf("    movq $%ld, %%r8\n", bnode->num);
+r9: NUM_N # 1 # printf("    movq $%ld, %%r9\n", bnode->num);
+rcx: NUM_N # 1 # printf("    movq $%ld, %%rcx\n", bnode->num);
 
 rax: VAR_N # 1 # printf("    movq %d(%%rbp), %%rax\n", var_offset(bnode->name));
 r10: VAR_N # 1 # printf("    movq %d(%%rbp), %%r10\n", var_offset(bnode->name));
 r11: VAR_N # 1 # printf("    movq %d(%%rbp), %%r11\n", var_offset(bnode->name));
+r8: VAR_N # 1 # printf("    movq %d(%%rbp), %%r8\n", var_offset(bnode->name));
+r9: VAR_N # 1 # printf("    movq %d(%%rbp), %%r9\n", var_offset(bnode->name));
+rcx: VAR_N # 1 # printf("    movq %d(%%rbp), %%rcx\n", var_offset(bnode->name));
 
 rax: PLUS_N(rax,r10) # 1 # printf("    addq %%r10, %%rax\n");
 r10: PLUS_N(r10,r11) # 1 # printf("    addq %%r11, %%r10\n");
+r11: PLUS_N(r11,r8) # 1 # printf("    addq %%r8, %%r11\n");
+r8: PLUS_N(r8,r9) # 1 # printf("    addq %%r9, %%r8\n");
+r9: PLUS_N(r9,rcx) # 1 # printf("    addq %%rcx, %%r9\n");
 
 rax: MULT_N(rax,r10) # 1 # printf("    imulq %%r10, %%rax\n");
 r10: MULT_N(r10,r11) # 1 # printf("    imulq %%r11, %%r10\n");
+r11: MULT_N(r11,r8) # 1 # printf("    imulq %%r8, %%r11\n");
+r8: MULT_N(r8,r9) # 1 # printf("    imulq %%r9, %%r8\n");
+r9: MULT_N(r9,rcx) # 1 # printf("    imulq %%rcx, %%r9\n");
 
 rax: MIN_N(rax,r10) # 1 # printf("    subq %%r10, %%rax\n");
 r10: MIN_N(r10,r11) # 1 # printf("    subq %%r11, %%r10\n");
+r11: MIN_N(r11,r8) # 1 # printf("    subq %%r8, %%r11\n");
+r8: MIN_N(r8,r9) # 1 # printf("    subq %%r9, %%r8\n");
+r9: MIN_N(r9,rcx) # 1 # printf("    subq %%rcx, %%r9\n");
 
 rax: AND_N(rax,r10) # 1 # printf("    andq %%r10, %%rax\n");
 r10: AND_N(r10,r11) # 1 # printf("    andq %%r11, %%r10\n");
+r11: AND_N(r11,r8) # 1 # printf("    andq %%r8, %%r11\n");
+r8: AND_N(r8,r9) # 1 # printf("    andq %%r9, %%r8\n");
+r9: AND_N(r9,rcx) # 1 # printf("    andq %%rcx, %%r9\n");
 
 rax: NOT_N(rax) # 1 # printf("    notq %%rax\n");
 r10: NOT_N(r10) # 1 # printf("    notq %%r10\n");
+r11: NOT_N(r11) # 1 # printf("    notq %%r11\n");
+r8: NOT_N(r8) # 1 # printf("    notq %%r8\n");
+r9: NOT_N(r9) # 1 # printf("    notq %%r9\n");
+rcx: NOT_N(rcx) # 1 # printf("    notq %%rcx\n");
 
 rax: GREAT_N(rax,r10) # 1 # printf("    cmpq %%r10, %%rax\n    setg %%al\n    movzbq %%al, %%rax\n");
 r10: GREAT_N(r10,r11) # 1 # printf("    cmpq %%r11, %%r10\n    setg %%r10b\n    movzbq %%r10b, %%r10\n");
+r11: GREAT_N(r11,r8) # 1 # printf("    cmpq %%r8, %%r11\n    setg %%r11b\n    movzbq %%r11b, %%r11\n");
+r8: GREAT_N(r8,r9) # 1 # printf("    cmpq %%r9, %%r8\n    setg %%r8b\n    movzbq %%r8b, %%r8\n");
+r9: GREAT_N(r9,rcx) # 1 # printf("    cmpq %%rcx, %%r9\n    setg %%r9b\n    movzbq %%r9b, %%r9\n");
 
 rax: EQUALS_N(rax,r10) # 1 # printf("    cmpq %%r10, %%rax\n    sete %%al\n    movzbq %%al, %%rax\n");
 r10: EQUALS_N(r10,r11) # 1 # printf("    cmpq %%r11, %%r10\n    sete %%r10b\n    movzbq %%r10b, %%r10\n");
+r11: EQUALS_N(r11,r8) # 1 # printf("    cmpq %%r8, %%r11\n    sete %%r11b\n    movzbq %%r11b, %%r11\n");
+r8: EQUALS_N(r8,r9) # 1 # printf("    cmpq %%r9, %%r8\n    sete %%r8b\n    movzbq %%r8b, %%r8\n");
+r9: EQUALS_N(r9,rcx) # 1 # printf("    cmpq %%rcx, %%r9\n    sete %%r9b\n    movzbq %%r9b, %%r9\n");
 
 rax: ARRAY_N(rax,r10) # 1 # printf("    movq (%%rax,%%r10,8), %%rax\n");
 r10: ARRAY_N(r10,r11) # 1 # printf("    movq (%%r10,%%r11,8), %%r10\n");
+r11: ARRAY_N(r11,r8) # 1 # printf("    movq (%%r11,%%r8,8), %%r11\n");
+r8: ARRAY_N(r8,r9) # 1 # printf("    movq (%%r8,%%r9,8), %%r8\n");
+r9: ARRAY_N(r9,rcx) # 1 # printf("    movq (%%r9,%%rcx,8), %%r9\n");
 
 %%
+
+/*
+ * --------------------------------------------------------------------------
+ * Variable / stack-frame management
+ * --------------------------------------------------------------------------
+ */
 
 static char *var_names[256];
 static int var_offsets[256];
@@ -53,39 +90,78 @@ static int var_count = 0;
 static int next_offset = 0;
 static int param_count = 0;
 
+/*
+ * Number of bytes currently temporarily pushed below the normal
+ * function stack frame.
+ *
+ * The normal stack frame is always a multiple of 16 bytes, therefore
+ * temp_stack_bytes can be used to maintain the required stack alignment
+ * before a call instruction.
+ */
+static int temp_stack_bytes = 0;
+
+
+/*
+ * --------------------------------------------------------------------------
+ * Labels for cond
+ * --------------------------------------------------------------------------
+ */
+
 static int label_count = 0;
+static int current_return_label = 0;
 
 static char *cond_names[256];
 static int cond_start_labels[256];
 static int cond_end_labels[256];
 static int cond_count = 0;
 
+
+/*
+ * --------------------------------------------------------------------------
+ * Variable management
+ * --------------------------------------------------------------------------
+ */
+
 int reset_params(void) {
     var_count = 0;
     next_offset = 0;
     param_count = 0;
     cond_count = 0;
+    temp_stack_bytes = 0;
+
     return 0;
 }
 
 int add_param(char *name) {
-    if (var_count < 256) {
-        next_offset -= 8;
-        var_names[var_count] = name;
-        var_offsets[var_count] = next_offset;
-        var_count++;
-	param_count++;
+    if (var_count >= 256) {
+        fprintf(stderr, "Too many variables\n");
+        exit(3);
     }
+
+    next_offset -= 8;
+
+    var_names[var_count] = name;
+    var_offsets[var_count] = next_offset;
+
+    var_count++;
+    param_count++;
+
     return 0;
 }
 
 int add_local(char *name) {
-    if (var_count < 256) {
-        next_offset -= 8;
-        var_names[var_count] = name;
-        var_offsets[var_count] = next_offset;
-        var_count++;
+    if (var_count >= 256) {
+        fprintf(stderr, "Too many variables\n");
+        exit(3);
     }
+
+    next_offset -= 8;
+
+    var_names[var_count] = name;
+    var_offsets[var_count] = next_offset;
+
+    var_count++;
+
     return 0;
 }
 
@@ -96,41 +172,546 @@ int var_offset(char *name) {
         }
     }
 
-    return 0;
+    fprintf(stderr, "Unknown variable during code generation: %s\n", name);
+    exit(3);
 }
 
-void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 
+/*
+ * Count all local variable definitions contained in a function.
+ *
+ * Every syntactic variable definition receives its own stack slot.
+ * This lets us allocate the complete stack frame once in the prologue
+ * instead of changing %rsp whenever a VARDEF is executed.
+ */
+static int count_local_defs(treenode_t *node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+
+    if (node->type == VARDEF_N) {
+        count++;
+    }
+
+    count += count_local_defs(node->left);
+    count += count_local_defs(node->right);
+    count += count_local_defs(node->third);
+
+    return count;
+}
+
+
+/*
+ * Store function parameters in their stack-frame slots.
+ *
+ * The first six integer arguments arrive in the normal System V AMD64
+ * argument registers. Arguments beyond six are read from the caller's stack.
+ */
 void store_params(void) {
     static const char *param_regs[] = {
-        "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"
+        "%rdi",
+        "%rsi",
+        "%rdx",
+        "%rcx",
+        "%r8",
+        "%r9"
     };
 
-    for (int i = 0; i < param_count && i < 6; i++) {
-        printf("    subq $8, %%rsp\n");
-        printf("    movq %s, %d(%%rbp)\n", param_regs[i], var_offsets[i]);
+    for (int i = 0; i < param_count; i++) {
+        if (i < 6) {
+            printf(
+                "    movq %s, %d(%%rbp)\n",
+                param_regs[i],
+                var_offsets[i]
+            );
+        } else {
+            /*
+             * 0(%rbp)  = old %rbp
+             * 8(%rbp)  = return address
+             * 16(%rbp) = argument 7
+             */
+            int incoming_offset = 16 + (i - 6) * 8;
+
+            printf(
+                "    movq %d(%%rbp), %%rax\n",
+                incoming_offset
+            );
+
+            printf(
+                "    movq %%rax, %d(%%rbp)\n",
+                var_offsets[i]
+            );
+        }
     }
 }
 
-void generate_expr(treenode_t *expr) {
-    if (!expr) return;
 
-    burm_label(expr);
-    burm_reduce(expr, burm_rax_NT);
+/*
+ * --------------------------------------------------------------------------
+ * Temporary stack helpers
+ * --------------------------------------------------------------------------
+ */
+
+static void push_rax(void) {
+    printf("    pushq %%rax\n");
+    temp_stack_bytes += 8;
 }
+
+static void pop_rax(void) {
+    printf("    popq %%rax\n");
+    temp_stack_bytes -= 8;
+}
+
+static void pop_r10(void) {
+    printf("    popq %%r10\n");
+    temp_stack_bytes -= 8;
+}
+
+static void pop_r11(void) {
+    printf("    popq %%r11\n");
+    temp_stack_bytes -= 8;
+}
+
+
+/*
+ * --------------------------------------------------------------------------
+ * iburg
+ * --------------------------------------------------------------------------
+ */
+
+void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
+
+
+/*
+ * --------------------------------------------------------------------------
+ * Function-call support
+ * --------------------------------------------------------------------------
+ */
+
+static int contains_call(treenode_t *node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    if (node->type == CALL_N) {
+        return 1;
+    }
+
+    return contains_call(node->left)
+        || contains_call(node->right)
+        || contains_call(node->third);
+}
+
+
+/*
+ * Count the expressions stored in an ARGS_N list.
+ */
+static int count_args(treenode_t *node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    if (node->type == ARGS_N) {
+        return count_args(node->left)
+             + (node->right != NULL ? 1 : 0);
+    }
+
+    /*
+     * This case is mainly defensive. Normally every argument is contained
+     * in an ARGS_N node.
+     */
+    return 1;
+}
+
+
+/*
+ * Convert the ARGS_N tree into a simple array while preserving the
+ * source-code order of the arguments.
+ */
+static int fill_args(
+    treenode_t *node,
+    treenode_t **args,
+    int index
+) {
+    if (node == NULL) {
+        return index;
+    }
+
+    if (node->type == ARGS_N) {
+        index = fill_args(node->left, args, index);
+
+        if (node->right != NULL) {
+            args[index++] = node->right;
+        }
+
+        return index;
+    }
+
+    args[index++] = node;
+
+    return index;
+}
+
+
+void generate_expr(treenode_t *expr);
+static void generate_expr_safe(treenode_t *expr);
+
+
+/*
+ * Generate a System V AMD64 function call.
+ *
+ * Arguments are evaluated from left to right and temporarily stored on the
+ * stack. This is necessary because evaluating a later argument may itself
+ * contain a function call and therefore destroy caller-saved registers.
+ *
+ * The first six arguments are moved into
+ *
+ *   %rdi, %rsi, %rdx, %rcx, %r8, %r9
+ *
+ * and further arguments are placed on the stack.
+ */
+static void generate_call(treenode_t *node) {
+    static const char *arg_regs[] = {
+        "%rdi",
+        "%rsi",
+        "%rdx",
+        "%rcx",
+        "%r8",
+        "%r9"
+    };
+
+    int argc = count_args(node->left);
+
+    treenode_t **args = NULL;
+
+    if (argc > 0) {
+        args = malloc(sizeof(treenode_t *) * argc);
+
+        if (args == NULL) {
+            fprintf(stderr, "Out of memory\n");
+            exit(3);
+        }
+
+        fill_args(node->left, args, 0);
+    }
+
+
+    /*
+     * First evaluate every argument.
+     *
+     * Each result is saved on the stack so that nested function calls cannot
+     * destroy arguments that were evaluated earlier.
+     */
+    for (int i = 0; i < argc; i++) {
+        generate_expr(args[i]);
+        push_rax();
+    }
+
+
+    /*
+     * Arguments beyond the sixth argument have to be present on the stack at
+     * call time.
+     */
+    int stack_arg_count = 0;
+
+    if (argc > 6) {
+        stack_arg_count = argc - 6;
+    }
+
+    int stack_arg_bytes = stack_arg_count * 8;
+
+
+    /*
+     * Immediately before CALL, %rsp must be aligned to 16 bytes.
+     *
+     * temp_stack_bytes already includes all temporarily saved arguments and
+     * possibly temporary values belonging to an outer expression.
+     */
+    int padding = 0;
+
+    if ((temp_stack_bytes + stack_arg_bytes) % 16 != 0) {
+        padding = 8;
+    }
+
+    int outgoing_bytes = stack_arg_bytes + padding;
+
+    if (outgoing_bytes > 0) {
+        printf("    subq $%d, %%rsp\n", outgoing_bytes);
+        temp_stack_bytes += outgoing_bytes;
+    }
+
+
+    /*
+     * The temporary argument values are above the newly allocated outgoing
+     * argument area.
+     *
+     * The most recently evaluated argument is nearest to %rsp in the
+     * temporary area.
+     */
+    int register_args = argc;
+
+    if (register_args > 6) {
+        register_args = 6;
+    }
+
+    for (int i = 0; i < register_args; i++) {
+        int source_offset =
+            outgoing_bytes + (argc - 1 - i) * 8;
+
+        printf(
+            "    movq %d(%%rsp), %s\n",
+            source_offset,
+            arg_regs[i]
+        );
+    }
+
+
+    /*
+     * Place arguments 7, 8, ... on the outgoing call stack.
+     *
+     * Immediately before CALL:
+     *
+     *   0(%rsp)  = argument 7
+     *   8(%rsp)  = argument 8
+     *   ...
+     */
+    for (int i = 6; i < argc; i++) {
+        int source_offset =
+            outgoing_bytes + (argc - 1 - i) * 8;
+
+        int destination_offset =
+            (i - 6) * 8;
+
+        printf(
+            "    movq %d(%%rsp), %%r11\n",
+            source_offset
+        );
+
+        printf(
+            "    movq %%r11, %d(%%rsp)\n",
+            destination_offset
+        );
+    }
+
+
+	printf("    xorl %%eax, %%eax\n");
+	printf("    call %s\n", node->name);
+
+
+    /*
+     * Remove both the outgoing argument area and the temporary argument
+     * copies.
+     *
+     * The return value in %rax remains untouched.
+     */
+    int cleanup_bytes =
+        outgoing_bytes + argc * 8;
+
+    if (cleanup_bytes > 0) {
+        printf("    addq $%d, %%rsp\n", cleanup_bytes);
+        temp_stack_bytes -= cleanup_bytes;
+    }
+
+
+    free(args);
+}
+
+
+/*
+ * Safe expression generation for expressions containing function calls.
+ *
+ * Caller-saved registers cannot be relied upon across CALL instructions.
+ * Therefore intermediate results are temporarily pushed to the stack.
+ */
+static void generate_expr_safe(treenode_t *expr) {
+    if (expr == NULL) {
+        return;
+    }
+
+    switch (expr->type) {
+        case NUM_N:
+            printf(
+                "    movq $%ld, %%rax\n",
+                expr->num
+            );
+            break;
+
+
+        case VAR_N:
+            printf(
+                "    movq %d(%%rbp), %%rax\n",
+                var_offset(expr->name)
+            );
+            break;
+
+
+        case CALL_N:
+            generate_call(expr);
+            break;
+
+
+        case NOT_N:
+            generate_expr_safe(expr->left);
+            printf("    notq %%rax\n");
+            break;
+
+
+        case PLUS_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    addq %%r10, %%rax\n");
+            break;
+
+
+        case MULT_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    imulq %%r10, %%rax\n");
+            break;
+
+
+        case MIN_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    subq %%r10, %%rax\n");
+            break;
+
+
+        case AND_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    andq %%r10, %%rax\n");
+            break;
+
+
+        case GREAT_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    cmpq %%r10, %%rax\n");
+            printf("    setg %%al\n");
+            printf("    movzbq %%al, %%rax\n");
+            break;
+
+
+        case EQUALS_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf("    cmpq %%r10, %%rax\n");
+            printf("    sete %%al\n");
+            printf("    movzbq %%al, %%rax\n");
+            break;
+
+
+        case ARRAY_N:
+            generate_expr_safe(expr->left);
+            push_rax();
+
+            generate_expr_safe(expr->right);
+            printf("    movq %%rax, %%r10\n");
+
+            pop_rax();
+
+            printf(
+                "    movq (%%rax,%%r10,8), %%rax\n"
+            );
+            break;
+
+
+        default:
+            fprintf(
+                stderr,
+                "Unsupported expression node during code generation: %d\n",
+                expr->type
+            );
+            exit(3);
+    }
+}
+
+
+/*
+ * Expressions that contain no function calls are still handled by iburg.
+ *
+ * This preserves the better register-based code selection of the previous
+ * compiler. Only expressions containing calls use the stack-safe generator.
+ */
+void generate_expr(treenode_t *expr) {
+    if (expr == NULL) {
+        return;
+    }
+
+    if (contains_call(expr)) {
+        generate_expr_safe(expr);
+    } else {
+        burm_label(expr);
+        burm_reduce(expr, burm_rax_NT);
+    }
+}
+
+
+/*
+ * --------------------------------------------------------------------------
+ * cond labels
+ * --------------------------------------------------------------------------
+ */
 
 int new_label(void) {
     label_count++;
     return label_count;
 }
 
-void push_cond(char *name, int start_label, int end_label) {
-    if (cond_count < 256) {
-        cond_names[cond_count] = name;
-        cond_start_labels[cond_count] = start_label;
-        cond_end_labels[cond_count] = end_label;
-        cond_count++;
+void push_cond(
+    char *name,
+    int start_label,
+    int end_label
+) {
+    if (cond_count >= 256) {
+        fprintf(stderr, "Too many nested cond statements\n");
+        exit(3);
     }
+
+    cond_names[cond_count] = name;
+    cond_start_labels[cond_count] = start_label;
+    cond_end_labels[cond_count] = end_label;
+
+    cond_count++;
 }
 
 void pop_cond(void) {
@@ -140,64 +721,125 @@ void pop_cond(void) {
 }
 
 int find_cond_start(char *name) {
+    if (cond_count <= 0) {
+        fprintf(stderr, "continue outside cond\n");
+        exit(3);
+    }
+
     if (name == NULL) {
         return cond_start_labels[cond_count - 1];
     }
 
     for (int i = cond_count - 1; i >= 0; i--) {
-        if (cond_names[i] != NULL && strcmp(cond_names[i], name) == 0) {
+        if (
+            cond_names[i] != NULL
+            && strcmp(cond_names[i], name) == 0
+        ) {
             return cond_start_labels[i];
         }
     }
 
-    return cond_start_labels[cond_count - 1];
+    fprintf(stderr, "Unknown cond label: %s\n", name);
+    exit(3);
 }
 
 int find_cond_end(char *name) {
+    if (cond_count <= 0) {
+        fprintf(stderr, "break outside cond\n");
+        exit(3);
+    }
+
     if (name == NULL) {
         return cond_end_labels[cond_count - 1];
     }
 
     for (int i = cond_count - 1; i >= 0; i--) {
-        if (cond_names[i] != NULL && strcmp(cond_names[i], name) == 0) {
+        if (
+            cond_names[i] != NULL
+            && strcmp(cond_names[i], name) == 0
+        ) {
             return cond_end_labels[i];
         }
     }
 
-    return cond_end_labels[cond_count - 1];
+    fprintf(stderr, "Unknown cond label: %s\n", name);
+    exit(3);
 }
+
+
+/*
+ * --------------------------------------------------------------------------
+ * Statements
+ * --------------------------------------------------------------------------
+ */
 
 void generate_statement(treenode_t *node);
 
 void generate_contbreak(treenode_t *node) {
-    if (!node) return;
+    if (node == NULL) {
+        return;
+    }
 
     if (node->type == CONTINUE_N) {
-        printf("    jmp .Lcond_start_%d\n", find_cond_start(node->name));
+        printf(
+            "    jmp .Lcond_start_%d\n",
+            find_cond_start(node->name)
+        );
     } else if (node->type == BREAK_N) {
-        printf("    jmp .Lcond_end_%d\n", find_cond_end(node->name));
+        printf(
+            "    jmp .Lcond_end_%d\n",
+            find_cond_end(node->name)
+        );
     }
 }
 
 void generate_guarded(treenode_t *node) {
-    if (!node) return;
+    if (node == NULL) {
+        return;
+    }
 
     int next_label = new_label();
 
+
     if (node->left != NULL) {
         generate_expr(node->left);
+
         printf("    testq $1, %%rax\n");
-        printf("    jz .Lguard_next_%d\n", next_label);
+        printf(
+            "    jz .Lguard_next_%d\n",
+            next_label
+        );
     }
 
+
+    /*
+     * A Guarded contains a new Stats scope.
+     *
+     * Variables defined inside it must not remain visible when code for the
+     * next Guarded is generated.
+     *
+     * next_offset is deliberately NOT restored: every syntactic variable
+     * definition receives a unique stack slot.
+     */
+    int saved_var_count = var_count;
+
     generate_statement(node->right);
+
+    var_count = saved_var_count;
+
+
     generate_contbreak(node->third);
 
-    printf(".Lguard_next_%d:\n", next_label);
+    printf(
+        ".Lguard_next_%d:\n",
+        next_label
+    );
 }
 
 void generate_guarded_list(treenode_t *node) {
-    if (!node) return;
+    if (node == NULL) {
+        return;
+    }
 
     if (node->type == STATS_N) {
         generate_guarded_list(node->left);
@@ -208,7 +850,9 @@ void generate_guarded_list(treenode_t *node) {
 }
 
 void generate_statement(treenode_t *node) {
-    if (!node) return;
+    if (node == NULL) {
+        return;
+    }
 
     switch (node->type) {
         case STATS_N:
@@ -216,84 +860,192 @@ void generate_statement(treenode_t *node) {
             generate_statement(node->right);
             break;
 
-        case RETURN_N:
-            generate_expr(node->left);
-            printf("    leave\n");
-            printf("    ret\n");
-            break;
+
+	case RETURN_N:
+    		generate_expr(node->left);
+
+    		printf(
+        		"    jmp .Lfunc_return_%d\n",
+        		current_return_label
+    		);
+    		break;
+
 
         case VARDEF_N:
-            add_local(node->name);
-            printf("    subq $8, %%rsp\n");
+            /*
+             * The new variable is not visible inside its own initializer.
+             */
             generate_expr(node->left);
-            printf("    movq %%rax, %d(%%rbp)\n", var_offset(node->name));
+
+            add_local(node->name);
+
+            printf(
+                "    movq %%rax, %d(%%rbp)\n",
+                var_offset(node->name)
+            );
             break;
+
 
         case ASSIGN_N:
             generate_expr(node->left);
-            printf("    movq %%rax, %d(%%rbp)\n", var_offset(node->name));
-            break;
-	
-	case ARRAY_ASSIGN_N:
-            generate_expr(node->left);
-            printf("    subq $8, %%rsp\n");
-            printf("    movq %%rax, (%%rsp)\n");
-            generate_expr(node->right);
-            printf("    subq $8, %%rsp\n");
-            printf("    movq %%rax, (%%rsp)\n");
-            generate_expr(node->third);
-            printf("    movq (%%rsp), %%r11\n");
-            printf("    addq $8, %%rsp\n");
-            printf("    movq (%%rsp), %%r10\n");
-            printf("    addq $8, %%rsp\n");
-            printf("    movq %%rax, (%%r10,%%r11,8)\n");
+
+            printf(
+                "    movq %%rax, %d(%%rbp)\n",
+                var_offset(node->name)
+            );
             break;
 
-	case CONDS_N: {
+
+        case ARRAY_ASSIGN_N:
+            /*
+             * Evaluate:
+             *
+             *   base
+             *   index
+             *   value
+             *
+             * Intermediate values are saved on the stack so calls may also
+             * occur inside these expressions.
+             */
+
+            generate_expr(node->left);
+            push_rax();
+
+            generate_expr(node->right);
+            push_rax();
+
+            generate_expr(node->third);
+
+            /*
+             * %rax = value
+             * %r11 = index
+             * %r10 = base
+             */
+            pop_r11();
+            pop_r10();
+
+            printf(
+                "    movq %%rax, (%%r10,%%r11,8)\n"
+            );
+            break;
+
+
+        case CONDS_N: {
             int start_label = new_label();
             int end_label = new_label();
 
-            push_cond(node->name, start_label, end_label);
+            push_cond(
+                node->name,
+                start_label,
+                end_label
+            );
 
-            printf(".Lcond_start_%d:\n", start_label);
+            printf(
+                ".Lcond_start_%d:\n",
+                start_label
+            );
+
             generate_guarded_list(node->left);
-            printf(".Lcond_end_%d:\n", end_label);
+
+            printf(
+                ".Lcond_end_%d:\n",
+                end_label
+            );
 
             pop_cond();
+
             break;
         }
 
+
         case CONTINUE_N:
-            printf("    jmp .Lcond_start_%d\n", find_cond_start(node->name));
+            printf(
+                "    jmp .Lcond_start_%d\n",
+                find_cond_start(node->name)
+            );
             break;
+
 
         case BREAK_N:
-            printf("    jmp .Lcond_end_%d\n", find_cond_end(node->name));
+            printf(
+                "    jmp .Lcond_end_%d\n",
+                find_cond_end(node->name)
+            );
             break;
 
+
         case TERMSTAT_N:
+            /*
+             * This now also handles a function call used purely as a
+             * statement. Its return value is simply ignored.
+             */
             generate_expr(node->left);
             break;
+
 
         default:
             break;
     }
 }
 
+
+/*
+ * --------------------------------------------------------------------------
+ * Function generation
+ * --------------------------------------------------------------------------
+ */
 int generate_function(treenode_t *func) {
-    if (!func || func->type != FUNC_N) return 0;
+    if (
+        func == NULL
+        || func->type != FUNC_N
+    ) {
+        return 0;
+    }
+
+    int local_count =
+        count_local_defs(func->left);
+
+    int frame_size =
+        (param_count + local_count) * 8;
+
+    if (frame_size % 16 != 0) {
+        frame_size += 8;
+    }
+
+    temp_stack_bytes = 0;
+
+    current_return_label = new_label();
 
     printf(".globl %s\n", func->name);
     printf("%s:\n", func->name);
+
     printf("    pushq %%rbp\n");
     printf("    movq %%rsp, %%rbp\n");
 
+    if (frame_size > 0) {
+        printf(
+            "    subq $%d, %%rsp\n",
+            frame_size
+        );
+    }
+
     store_params();
+
     generate_statement(func->left);
 
+    /*
+     * Falls die Funktion ohne explizites return bis zum Ende läuft.
+     */
     printf("    movq $0, %%rax\n");
+
+    printf(
+        ".Lfunc_return_%d:\n",
+        current_return_label
+    );
+
     printf("    leave\n");
     printf("    ret\n");
 
     return 0;
 }
+

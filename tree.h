@@ -31,7 +31,9 @@ enum treenode_type {
     CONDS_N,
     GUARDED_N,
     CONTINUE_N,
-    BREAK_N
+    BREAK_N,
+    CALL_N,
+    ARGS_N
 };
 
 typedef struct treenode {
@@ -67,8 +69,6 @@ treenode_t* create_and(treenode_t *t1, treenode_t *t2);
 
 treenode_t* create_grEqMin(int op, treenode_t *t1, treenode_t *t2);
 
-treenode_t* getFirstReturn(treenode_t *first, treenode_t *last);
-
 treenode_t* create_stats(treenode_t *first, treenode_t *second);
 
 treenode_t* create_vardef(char *name, treenode_t *expr);
@@ -92,5 +92,9 @@ int reset_params(void);
 int add_param(char *name);
 
 int generate_function(treenode_t *func);
+
+treenode_t* create_args(treenode_t *args, treenode_t *expr);
+
+treenode_t* create_call(char *name, treenode_t *args);
 
 #endif

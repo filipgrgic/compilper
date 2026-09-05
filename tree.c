@@ -179,3 +179,24 @@ treenode_t* create_break(char *label) {
 
     return n;
 }
+
+
+treenode_t* create_args(treenode_t *args, treenode_t *expr) {
+    if (expr == NULL) {
+        return args;
+    }
+
+    treenode_t *n = create_node(ARGS_N);
+    n->left = args;
+    n->right = expr;
+
+    return n;
+}
+
+treenode_t* create_call(char *name, treenode_t *args) {
+    treenode_t *n = create_node(CALL_N);
+    n->name = strdup(name);
+    n->left = args;
+
+    return n;
+}
